@@ -1,6 +1,7 @@
 extends Position2D
 
-class_name Spawner
+"Icon made by Freepik from www.flaticon.com"
+class_name Spawner, "res://icons/Spawner.svg"
 
 export (bool) var is_root = false
 

@@ -1,5 +1,8 @@
 extends Node
 
+"Icon made by Freepik from www.flaticon.com"
+class_name EventManager, "res://icons/EventManager.svg"
+
 enum EVENT{
     GAME_START,
     ENEMIES_PRELOADED,

@@ -1,11 +1,12 @@
 tool
 extends Node
 
-class_name EventConsumer
+"Icon made by Freepik from www.flaticon.com"
+class_name EventConsumer, "res://icons/EventConsumer.svg"
 
 func _ready():
 	update_configuration_warning()
-	var err = EventManager.connect("updated", get_parent(), "_consume_event")
+	var err = EVENTMANAGER.connect("updated", get_parent(), "_consume_event")
 	if err: 
 		printerr("Coudl't subscribe to event manager: {0}" % self.name)
 
