@@ -2,7 +2,7 @@ tool
 extends Node
 
 "Icon made by Freepik from www.flaticon.com"
-class_name EventConsumer, "res://icons/EventConsumer.svg"
+class_name EventConsumer, "res://El-Santo/icons/EventConsumer.svg"
 
 func _ready():
 	#warning-ignore:unused_variable
@@ -10,7 +10,7 @@ func _ready():
 
 func _get_configuration_warning():
 	if not ProjectSettings.has_method("autoload/EVENTMANAGER"): 
-		ProjectSettings.set_setting("autoload/EVENTMANAGER", "*res://El Santo/EventManager.gd")
+		ProjectSettings.set_setting("autoload/EVENTMANAGER", "*res://El-Santo/EventManager.gd")
 	if not (get_parent().has_method("_consume_event")):
 		return "Parent doesn't implement '_consume_event(event:int)->void' method"
 	return "" 

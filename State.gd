@@ -1,7 +1,7 @@
 extends Node
 
 "Icon made by Freepik from www.flaticon.com"
-class_name State, "res://icons/State.svg"
+class_name State, "res://El-Santo/icons/State.svg"
 
 var target: Object = null
 var machine: State = null
