@@ -5,6 +5,7 @@ class_name State, "res://El-Santo/icons/State.svg"
 
 var target: Object = null
 var machine: State = null
+var previous: State = null
 var current: State = null
 var next: State 
 var states:Dictionary = {}
@@ -58,6 +59,7 @@ func stop():
 func switch(): 
 	if current: 
 		current.exit()
+	previous = current
 	current = next
 	if current: 
 		current.enter()

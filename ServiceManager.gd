@@ -1,7 +1,7 @@
 extends Node
 
 "Icon made by Freepik from www.flaticon.com"
-class_name ServiceManager, "res://icons/ServiceManager.svg"
+class_name ServiceManager #, "res://icons/ServiceManager.svg"
 signal updated
 var _requests:Array = []
 
