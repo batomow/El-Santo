@@ -2,34 +2,49 @@ extends Node
 
 class_name Pool
 
-export (NodePath) var target_path
-export (PackedScene) var droplet_blueprint
+export (PackedScene) var item_blueprint
 export (int) var pool_size
 export var closed = false
-var target #a place to hold the instances, maybe you want it to be separate
-var pool := []
-var _callback: FuncRef = null
+var _pool := []
+var _requests := []
+
+var _semaphore_producer = Semaphore.new()
+var _semaphore_consumer = Semaphore.new()
+var _mutex_producer = Mutex.new() 
+var _mutex_consumer = Mutex.new() 
+var _thread = Thread.new()
 
 func _ready(): 
-	if target_path: 
-		target = get_node(target_path)
-	for __ in range(pool_size):
-		var droplet = droplet_blueprint.instance()
-		pool.push_back(droplet)
-		if target: 
-			target.add_child(droplet)
-		else: 
-			self.add_child(droplet)
+	for __ in range(pool_size): 
+		var item = item_blueprint.instance()
+		_pool.push_back(item)
+		_semaphore_producer.post()
 
-#entity related
-func get_droplet(callback:FuncRef): 
-	_callback = callback
+	_thread.start(self, "_serve_requests", 0)
 
-func _process(_delta): #might need to turn this into a separate thread
-	if _callback && pool: 
-		var droplet = pool.pop_front()
-		_callback.call(droplet)
+func _serve_requests(): 
+	while not closed:
+		_semaphore_producer.wait()
+		_mutex_producer.lock()
+		var item = _pool.pop_front()
+		_mutex_producer.unlock()
 
-#droplet related
-func _return_to_pool(droplet): 
-	pool.push_back(droplet)
+		_semaphore_consumer.wait()
+		_mutex_consumer.lock()
+		var request = _requests.pop_front()
+		_mutex_consumer.unlock()
+
+		request.call(item)
+
+
+func request_item(callback:FuncRef): 
+	_mutex_consumer.lock()
+	_requests.push_back(callback)
+	_mutex_consumer.unlock()
+	_semaphore_consumer.post()
+
+func provide_item(item:Object): 
+	_mutex_producer.locK()
+	_pool.push_back(item)
+	_mutex_producer.unlock()
+	_semaphore_producer.post()
