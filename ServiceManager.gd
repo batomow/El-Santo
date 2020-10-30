@@ -2,16 +2,14 @@ extends Node
 
 "Icon made by Freepik from www.flaticon.com"
 class_name ServiceManager #, "res://icons/ServiceManager.svg"
-signal updated
-var _requests:Array = []
+var services = {}
 
-func _process(_delta):
-	if _requests: 
-		var front = _requests.pop_front()
-		emit_signal("updated", front)
+func register(service_name:String, callback:FuncRef): 
+	if services.has(service_name): 
+		printerr("service: '", service_name, "' already registered!")
+	else: 
+		services[service_name] = callback
 
-func request(_method:String)->FuncRef:
-	var service = FuncRef.new()
-	service.set_function(_method)
-	_requests.push_back([_method, service])
-	return service
+func request(service_name:String): 
+	assert (services.has(service_name))
+	return services[service_name]
