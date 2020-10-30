@@ -3,6 +3,7 @@ extends Node
 class_name Pool
 
 export (PackedScene) var item_blueprint
+export (String) var service_posfix
 export (int) var pool_size
 export var closed = false
 var _pool := []
@@ -15,14 +16,17 @@ var _mutex_consumer = Mutex.new()
 var _thread = Thread.new()
 
 func _ready(): 
+	SERVICEMANAGER.register('provide_' + service_posfix, funcref(self, "provide_item"))
+	SERVICEMANAGER.register('request_' + service_posfix, funcref(self, "request_item"))
 	for __ in range(pool_size): 
 		var item = item_blueprint.instance()
+		self.add_child(item)
 		_pool.push_back(item)
 		_semaphore_producer.post()
 
-	_thread.start(self, "_serve_requests", 0)
+	_thread.start(self, "_serve_requests", null, 0)
 
-func _serve_requests(): 
+func _serve_requests(_userdata): 
 	while not closed:
 		_semaphore_producer.wait()
 		_mutex_producer.lock()
@@ -34,7 +38,7 @@ func _serve_requests():
 		var request = _requests.pop_front()
 		_mutex_consumer.unlock()
 
-		request.call(item)
+		request.call_func(item)
 
 
 func request_item(callback:FuncRef): 
@@ -48,3 +52,6 @@ func provide_item(item:Object):
 	_pool.push_back(item)
 	_mutex_producer.unlock()
 	_semaphore_producer.post()
+
+func _exit_tree():
+	_thread.wait_to_finish()
