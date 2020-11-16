@@ -18,8 +18,10 @@ var _thread = Thread.new()
 func _ready(): 
 	SERVICEMANAGER.register('provide_' + service_posfix, funcref(self, "provide_item"))
 	SERVICEMANAGER.register('request_' + service_posfix, funcref(self, "request_item"))
-	for __ in range(pool_size): 
+	for n in range(pool_size): 
 		var item = item_blueprint.instance()
+		item.original_position = Vector2(n*20, 0)
+		item.position = item.original_position
 		self.add_child(item)
 		_pool.push_back(item)
 		_semaphore_producer.post()
@@ -48,7 +50,7 @@ func request_item(callback:FuncRef):
 	_semaphore_consumer.post()
 
 func provide_item(item:Object): 
-	_mutex_producer.locK()
+	_mutex_producer.lock()
 	_pool.push_back(item)
 	_mutex_producer.unlock()
 	_semaphore_producer.post()
