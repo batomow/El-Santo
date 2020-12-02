@@ -13,3 +13,6 @@ func register(service_name:String, callback:FuncRef):
 func request(service_name:String): 
 	assert (services.has(service_name))
 	return services[service_name]
+
+func check_for_service(service_name:String):
+	return services.has(service_name)
