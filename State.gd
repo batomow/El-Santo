@@ -16,6 +16,25 @@ export (bool) var reset_on_quit = 1
 export (int) var default_node = 0
 export (NodePath) var target_path = null
 
+#warning-ignore:unused_signal
+#warning-ignore:unused_signal
+signal async_execute(method, varargs)
+signal async_evaluate(method, varargs)
+
+func _init().(): 
+	#warning-ignore:return_value_discarded
+	#warning-ignore:return_value_discarded
+	self.connect("async_execute", self, "_async_execute", [], CONNECT_DEFERRED | CONNECT_ONESHOT)
+	self.connect("async_evaluate", self, "_async_evaluate", [], CONNECT_DEFERRED | CONNECT_ONESHOT)
+
+func reset_async():
+	#warning-ignore:return_value_discarded
+	#warning-ignore:return_value_discarded
+	if not self.is_connected("async_execute", self, "_async_evaluate"):
+		self.connect("async_execute", self, "_async_execute", [], CONNECT_DEFERRED | CONNECT_ONESHOT)
+	if not self.is_connected("async_evaluate", self, "_async_evaluate"):
+		self.connect("async_evaluate", self, "_async_evaluate", [], CONNECT_DEFERRED | CONNECT_ONESHOT)
+
 func _set_target(_target:Object, _machine:State = null):
 	target = _target
 	machine = _machine
@@ -38,10 +57,16 @@ func execute(_delta):
 		current.execute(_delta)
 	if current != next: 
 		switch()
+	
+func _async_execute(method: FuncRef, varargs=[]):
+	yield(method.call_funcv(varargs), "completed")
 
 func evaluate(_delta): 
 	if current: 
 		current.evaluate(_delta)
+
+func _async_evaluate(method: FuncRef, varargs=[]):
+	yield(method.call_funcv(varargs), "completed")
 
 func exit(): 
 	if type == 1: 
